@@ -23,28 +23,36 @@ class TFD_Loader_Filesystem extends Twig_Loader_Filesystem {
 
   public function findTemplate($name) {
     $this->validateName($name);
-    if (!isset($this->resolverCache[$name])) {
-      $found = FALSE;
-      if (is_readable($name)) {
-        $this->resolverCache[$name] = $name;
-        $found = TRUE;
-      }
-      else {
-        $paths = twig_get_discovered_templates();
 
-        if (array_key_exists($name, $paths)) {
-          $completeName = $paths[$name];
-          if (is_readable($completeName)) {
-            $this->resolverCache[$name] = $completeName;
-            $found = TRUE;
+    try {
+      return parent::findTemplate($name);
+    } catch (Twig_Error_Loader $e) {
+      $previous = $e;
+
+      // for BC
+      if (!isset($this->resolverCache[$name])) {
+        $found = FALSE;
+        if (is_readable($name)) {
+          $this->resolverCache[$name] = $name;
+          $found = TRUE;
+        }
+        else {
+          $paths = twig_get_discovered_templates();
+
+          if (array_key_exists($name, $paths)) {
+            $completeName = $paths[$name];
+            if (is_readable($completeName)) {
+              $this->resolverCache[$name] = $completeName;
+              $found = TRUE;
+            }
           }
         }
+        if (!$found) {
+          throw new Twig_Error_Loader(sprintf('Could not find a cache key for template "%s"', $name), -1, null, $previous);
+        }
       }
-      if (!$found) {
-        throw new Twig_Error_Loader(sprintf('Could not find a cache key for template "%s"', $name));
-      }
+      return $this->resolverCache[$name];
     }
-    return $this->resolverCache[$name];
   }
 
 }

@@ -141,7 +141,15 @@ function twig_get_instance() {
         $twigEnvironment['cache'] = $cache;
       }
     }
+
     $loader = new TFD_Loader_Filesystem();
+    $theme_names = twig_get_theme_paths();
+    $loader->addPath(DRUPAL_ROOT);
+    foreach ($theme_names as $theme_name => $path) {
+      $templatesDirectory = DRUPAL_ROOT . DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR . 'templates';
+      $loader->addPath($templatesDirectory, $theme_name);
+    }
+
     $twig_engine = new TFD_Environment($loader, $twigEnvironment);
     $twig_engine->addExtension(new TFD_Extension());
   }
@@ -170,19 +178,7 @@ function twig_get_discovered_templates() {
   $implementations = &drupal_static(__FUNCTION__, array());
   if (!$implementations) {
     global $theme;
-    $available_themes = list_themes();
-    $theme_paths = array();
-    $theme_paths[$theme] = dirname($available_themes[$theme]->filename);
-    $basethemes = drupal_find_base_themes($available_themes, $theme);
-    $hasParent = FALSE;
-    if (count($basethemes) > 0) {
-      $hasParent = TRUE;
-      foreach (array_keys($basethemes) as $basename) {
-        if (isset($available_themes[$basename])) {
-          $theme_paths[$basename] = dirname($available_themes[$basename]->filename);
-        }
-      }
-    }
+    $theme_paths = twig_get_theme_paths($theme);
     $regex = '/' . str_replace('.', '\.', twig_extension()) . '$/';
     foreach ($theme_paths as $theme_name => $path) {
       $files = drupal_system_listing($regex, $path, 'name', 0);
@@ -204,6 +200,28 @@ function twig_get_discovered_templates() {
 
   }
   return $implementations;
+}
+
+/**
+ * @return array
+ */
+function twig_get_theme_paths() {
+  global $theme;
+
+  $available_themes    = list_themes();
+  $theme_paths         = array();
+  $theme_paths[$theme] = dirname($available_themes[$theme]->filename);
+  $basethemes          = drupal_find_base_themes($available_themes, $theme);
+
+  if (count($basethemes) > 0) {
+    foreach (array_keys($basethemes) as $basename) {
+      if (isset($available_themes[$basename])) {
+        $theme_paths[$basename] = dirname($available_themes[$basename]->filename);
+      }
+    }
+  }
+
+  return $theme_paths;
 }
 
 
