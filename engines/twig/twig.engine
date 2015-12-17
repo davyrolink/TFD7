@@ -192,13 +192,12 @@ function twig_get_discovered_templates() {
         $converted_path = str_replace("templates/", "", $matches[1]);
         $realpath = dirname($file->uri) . '/' . $file->filename;
 
+        $implementations[$theme_name . '::' . $converted_path] = $realpath;
+
+        // BC
         if ($theme === $theme_name) {
           $implementations[$converted_path] = $realpath;
         }
-        else {
-          $implementations[$theme_name . '::' . $converted_path] = $realpath;
-        }
-
       }
     }
 
