@@ -39,10 +39,12 @@ class TFD_Loader_Filesystem extends Twig_Loader_Filesystem
                     $found = $this->isTemplateReadable($name, $completeName);
                 }else {
                     global $theme;
-                    if (stripos($name,$theme,0) == 0){
+                    if (stripos($name,$theme.'::') === 0){
                         $name = str_replace($theme.'::','',$name);
-                        $completeName = $paths[$name];
-                        $found = $this->isTemplateReadable($name, $completeName);
+                        if (isset($paths[$name])) {
+                            $completeName = $paths[$name];
+                            $found = $this->isTemplateReadable($name, $completeName);
+                        }
                     }
                 }
             }

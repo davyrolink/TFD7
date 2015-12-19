@@ -151,7 +151,7 @@ function twig_get_instance() {
 /**
  * Find templates in the current theme and the basetheme
  * return an array where the paths are transformed into
- * theme::point:to:template.twig.tpl
+ * theme::point/to/template.twig.tpl
  *
  * Cache the implementations because this is a rather expensive
  * call which can occur multiple times per hit
