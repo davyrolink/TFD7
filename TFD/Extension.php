@@ -178,26 +178,25 @@ function tfd_hide($var) {
 
 /**
  * Additional Twig filter provided in Drupal 8 to render array ommitting
- * cetain elements in the array
+ * certain elements in the array
  *
- * Retrieves array of array elements to exclude from array
+ * example {{ content|without(['links','language']) }}
  *
- * @param $element
+ * @param $input array
+ * @param $keys_to_remove array
  * @return array
  */
 
-function tfd_without($array) {
-  if ($array instanceof ArrayAccess) {
-    $filtered = clone $array;
+function tfd_without($input, $keys_to_remove) {
+  if ($input instanceof ArrayAccess) {
+    $filtered = clone $input;
   }
   else {
-    $filtered = $array;
+    $filtered = $input;
   }
-  $args = func_get_args();
-  unset($args[0]);
-  foreach ($args as $arg) {
-    if (isset($filtered[$arg])) {
-      unset($filtered[$arg]);
+  foreach ($keys_to_remove as $key) {
+    if (isset($filtered[$key])) {
+      unset($filtered[$key]);
     }
   }
   return $filtered;
@@ -352,11 +351,12 @@ function tfd_url($item, $options = array()) {
     $ret = url('node/' . $item, (array) $options);
   }
   else {
-    $ret = url($item, (array) $options);
+    $parsed = drupal_parse_url($item);
+    $options += $parsed;
+    $ret = url($parsed['path'], (array) $options);
   }
   return check_url($ret);
 }
-
 
 function tfd_test_property($element, $propertyName, $value = TRUE) {
   return array_key_exists("#{$propertyName}", $element) && $element["#{$propertyName}"] == $value;
