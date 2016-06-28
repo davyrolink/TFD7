@@ -58,22 +58,9 @@ class TFD_NodeVisitor implements Twig_NodeVisitorInterface {
           }
         }
       }
-      elseif ($node->getNode('expr') instanceof Twig_Node_Expression_Function) {
-        $targetNode = $node->getNode('expr');
-        if ($targetNode->getAttribute('name') == 'hide') {
-          $targetNode = $this->castObject('TFD_Node_Expression_Nocall', $targetNode);
-          $targetNode->setAttribute('always_defined', TRUE);
-          $node = new TFD_Node_Hide($targetNode, $node->getLine(), $node->getNodeTag());
-        }
-      }
     }
     return $node;
   }
-
-  private function castObject($class, $object) {
-    return unserialize(preg_replace('/^O:\d+:"[^"]++"/', 'O:' . strlen($class) . ':"' . $class . '"', serialize($object)));
-  }
-
   /**
    * @return integer The priority level
    */

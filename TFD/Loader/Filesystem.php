@@ -1,11 +1,11 @@
 <?php
-
 /**
- * Loads template from the filesystem.
- *
+ * Class TFD_Cache_Filesystem
  * Part of the Drupal twig extension distribution
- * http://renebakx.nl/twig-for-drupal
+ *
+ * @see http://tfd7.rocks for more information
  */
+
 class TFD_Loader_Filesystem extends Twig_Loader_Filesystem
 {
     protected $resolverCache;
